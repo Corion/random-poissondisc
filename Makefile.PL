@@ -6,7 +6,7 @@ use ExtUtils::MakeMaker qw(WriteMakefile);
 # the contents of the Makefile that is written.
 
 # I should maybe use something like Shipwright...
-regen_README('lib/Random/LaplaceDisk.pm');
+regen_README('lib/Random/PoissonDisk.pm');
 #regen_EXAMPLES();
 
 my @tests = map { glob $_ } 't/*.t', 't/*/*.t';
@@ -15,19 +15,20 @@ WriteMakefile1(
     MIN_PERL_VERSION => '5.006',
     META_MERGE => {
         resources => {
-            repository => 'http://github.com/Corion/random-laplacedisk',
+            repository => 'http://github.com/Corion/random-poissondisk',
         },
     },
     BUILD_REQUIRES => {
                         #'Task::Weaken' => 0, #to be sure that weaken is present
     },
-    'NAME'          => 'Random::LaplaceDisk',
+    'NAME'          => 'Random::PoissonDisk',
     'LICENSE'       => 'perl',
-    'VERSION_FROM'  => 'lib/Random/LaplaceDisk.pm', # finds $VERSION
+    'VERSION_FROM'  => 'lib/Random/PoissonDisk.pm', # finds $VERSION
     'PREREQ_PM'     => { 
                        # some MT PRNG
+                       # 'Algorithm::Loops' => 0, # do we?
                       }, # e.g., Module::Name => 1.1
-    ABSTRACT_FROM   => 'lib/Random/LaplaceDisk.pm', # retrieve abstract from module
+    ABSTRACT_FROM   => 'lib/Random/PoissonDisk.pm', # retrieve abstract from module
     AUTHOR          => 'Max Maischein <corion@cpan.org>',
     test            => { TESTS => join( ' ', @tests ) },
 );
