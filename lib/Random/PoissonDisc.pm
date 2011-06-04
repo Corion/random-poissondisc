@@ -216,6 +216,8 @@ between 0 and 2r around C<$point>. These points are
 the candidates to check when trying to insert a new
 random point into the space.
 
+=cut
+
 my %grid_neighbours; # cache for the cubes
 sub neighbour_points {
     my ($size,$point,$grid) = @_;
