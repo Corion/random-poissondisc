@@ -3,6 +3,12 @@ use strict;
 use List::Util qw(sum);
 use Math::Random::MT::Auto qw(rand gaussian);
 
+use vars qw($VERSION %grid_neighbours);
+$VERSION = '0.01';
+
+# %grid_neighbours caches the vectors pointing to
+# neighbours
+
 =head1 NAME
 
 Random::PoissonDisc - distribute points aesthetically in R^n
@@ -117,8 +123,7 @@ sub points {
             
             # Check whether our point lies within the dimensions
             for (0..$#$p) {
-                do { #warn "$candidate Rejecting";
-                     ; next CANDIDATE }
+                 next CANDIDATE
                     if   $p->[$_] >= $options{ dimensions }->[ $_ ]
                       or $p->[$_] < 0
             };
@@ -218,7 +223,6 @@ random point into the space.
 
 =cut
 
-my %grid_neighbours; # cache for the cubes
 sub neighbour_points {
     my ($size,$point,$grid) = @_;
     
