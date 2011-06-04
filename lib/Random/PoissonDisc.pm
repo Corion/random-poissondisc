@@ -85,26 +85,24 @@ In the algorithm description, this constant is named I<k>.
 
 sub points {
     my ($class,%options) = @_;
-    # XXX Allow the grid to be passed in
     
     $options{candidates} ||= 30;
     $options{dimensions} ||= [100,100]; # do we only create integral points?
     $options{r} ||= 10;
     #$options{max} ||= 10; # we want to fill the space instead?!
+    $options{ grid } ||= {};
     
     my $grid_size = $options{ r } / sqrt( 0+@{$options{dimensions}});
     
     my @result;
     my @work;
-    my %grid; # well, a fakey grid, but as long as we use only integer
-    # coordinates for the grid, using a hash and normalized point coordinates is convenient
         
     # Create a first random point somewhere in our cube:
     my $p = [map { rnd(0,$_) } @{ $options{ dimensions }}];
     push @result, $p;
     push @work, $p;
     my $c = grid_coords($grid_size, $p);
-    $grid{ $c } = $p;
+    $options{ grid }->{ $c } = $p;
     
     while (@work) {
         my $origin = splice @work, int rnd(0,$#work), 1;
@@ -131,8 +129,8 @@ sub points {
             # check discs by using the grid
             # Here we should check the "neighbours" in the grid too
             my $c = grid_coords($grid_size, $p);
-            if (! $grid{ $c }) {
-                my @n = neighbour_points($grid_size, $p, \%grid);
+            if (! $options{ grid }->{ $c }) {
+                my @n = neighbour_points($grid_size, $p, $options{ grid });
                 for my $neighbour (@n) {
                     if( vdist($neighbour, $p) < $options{ r }) {
                         next CANDIDATE;
@@ -142,7 +140,7 @@ sub points {
                 # not already in grid, no close neighbours, add it
                 push @result, $p;
                 push @work, $p;
-                $grid{ $c } = $p;
+                $options{ grid }->{ $c } = $p;
                 #warn "$candidate Taking";
             } else {
                 #warn "$candidate Occupied";
@@ -296,5 +294,33 @@ sub random_unit_vector {
 
 The module does not use L<PDL> or any other
 vector library.
+
+=head1 REPOSITORY
+
+The public repository of this module is 
+L<http://github.com/Corion/random-poissondisc>.
+
+=head1 SUPPORT
+
+The public support forum of this module is
+L<http://perlmonks.org/>.
+
+=head1 BUG TRACKER
+
+Please report bugs in this module via the RT CPAN bug queue at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Random-PoissonDisc>
+or via mail to L<random-poissondisc@rt.cpan.org>.
+
+=head1 AUTHOR
+
+Max Maischein C<corion@cpan.org>
+
+=head1 COPYRIGHT (c)
+
+Copyright 2011 by Max Maischein C<corion@cpan.org>.
+
+=head1 LICENSE
+
+This module is released under the same terms as Perl itself.
 
 =cut
