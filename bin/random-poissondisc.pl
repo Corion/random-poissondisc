@@ -1,8 +1,8 @@
 #!/usr/bin/perl -w
 use strict;
-use Random::PoissonDisk;
+use Random::PoissonDisc;
 
-my $points = Random::LaplaceDisk->points(
+my $points = Random::PoissonDisc->points(
     dimensions => [100,100],
     r => 10,
 );
