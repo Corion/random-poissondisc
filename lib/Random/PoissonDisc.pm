@@ -26,11 +26,50 @@ sub grid_coords {
 
 # Return x(i)+e(i) and x(i)-e(i)
 # by using the grid
+# This should be the cartesian product enumerating
+# [-1,0,1] over all dimensions
+
+my %grid_neighbours;
 sub neighbour_points {
-    my ($size,$point) = @_;
+    my ($size,$point,$grid) = @_;
+    
+    my $dimension = 0+@$point;
+    my $vectors;
+    if (! $grid_neighbours{ $dimension }) {
+        my @elements = (-1,0,1);
+        $grid_neighbours{ $dimension } =
+        # Count up, and use the number in ternary as our odometer
+        [map {
+            my $val = $_;
+            my $res = [ map { 
+                          my $res = $elements[ $val % 3 ];
+                          $val = int($val/3);
+                          $res
+                        } 1..$dimension ];
+            } (1..3**$dimension)
+        ];
+    };
+    
     my @coords = split /\t/, grid_coords( $size, $point );
-    map {}
-    map {} @coords;
+
+    # Find the elements in the grid according to the offsets
+    map {
+        my $e = $_;
+        my $n = join "\t", map { $coords[$_]+$e->[$_] } 0..$#$_;
+        $grid->{ $n } ? $grid->{ $n } : ()
+    } @{ $grid_neighbours{ $dimension }};
+};
+
+# Euclidean length of a vector
+sub norm {
+    sqrt( sum @{[map {$_**2} @_]} );
+};
+
+# Euclidean distance between two points
+sub vdist {
+    my ($l,$r) = @_;
+    my @connector = map { $l->[$_] - $r->[$_] } 0..$#$l;
+    norm(@connector);
 };
 
 sub random_unit_vector {
@@ -45,10 +84,10 @@ sub random_unit_vector {
     # around 0 in (-1,1)    
     RETRY: {
         @vec = map { 1-2*gaussian() } 1..$dimensions;
-        # Normalize our vector:
-        $len = sqrt( sum @{[map {$_**2} @vec]} );
+        $len = norm(@vec);
         redo RETRY unless $len;
     };
+    # Normalize our vector so we get a unit vector
     @vec = map { $_ / $len } @vec;
     
     \@vec
@@ -110,7 +149,14 @@ sub points {
             # Here we should check the "neighbours" in the grid too
             my $c = grid_coords($grid_size, $p);
             if (! $grid{ $c }) {
-                # if not already in grid, add it
+                my @n = neighbour_points($grid_size, $p, \%grid);
+                for my $neighbour (@n) {
+                    if( vdist($neighbour, $p) < $options{ r }) {
+                        next CANDIDATE;
+                    };
+                };
+                
+                # not already in grid, no close neighbours, add it
                 push @result, $p;
                 push @work, $p;
                 $grid{ $c } = $p;
