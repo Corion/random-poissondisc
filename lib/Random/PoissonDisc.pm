@@ -5,93 +5,77 @@ use Math::Random::MT::Auto qw(rand gaussian);
 
 =head1 NAME
 
-Random::PoissonDisc - distribute points aesthetically in a plane
+Random::PoissonDisc - distribute points aesthetically in R^n
+
+=head1 SYNOPSIS
+
+    my $points = Random::PoissonDisc->points(
+        dimensions => [100,100],
+        r => $r,
+    );
+    print join( ",", @$_),"\n"
+        for @$points;
+
+This module allows relatively fast
+(O(N)) generation of random points in
+I<n>-dimensional space with a distance of
+at least C<r> between each other. This distribution
+results in aesthetic so called "blue noise".
+
+The algorithm was adapted from a sketch
+by Robert Bridson
+in L<http://www.cs.ubc.ca/~rbridson/docs/bridson-siggraph07-poissondisk.pdf>.
+
+=head1 DATA REPRESENTATION
+
+All vectors (or points) are represented
+as anonymous arrays of numbers. All have the same
+dimension as the cardinality of the C<dimensions>
+array passed in the C<< ->points >> method.
+
+=head2 USER INTERFACE
+
+=head3 C<< Random::PoissonDisc->points( %options ) >>
+
+Returns a reference to an array of points.
+
+Acceptable options are:
+
+=over 4
+
+=item *
+
+C<<r>> - minimum distance between points.
+
+Default is 10 units.
+
+=item *
+
+C<<dimensions>> - number of dimensions and respective value range as an arrayref.
+
+Default is
+
+    [ 100, 100 ]
+
+meaning all points will be in R^2 , with each coordinate in the
+range [0, 100).
+
+=item *
+
+C<<candidates>> - Number of candidates to inspect before deciding that no
+ew neighbours can be placed around a point.
+
+Default is 30.
+
+This number may or may not need to be tweaked if you go further up in
+dimensionality beyond 3 dimensions. The more candidates you inspect
+the longer the algorithm will run for generating a number of points.
+
+In the algorithm description, this constant is named I<k>.
+
+=back
 
 =cut
-
-# What pRNG do we use?
-# Do we use/support something like PDL for speed?
-
-sub rnd {
-    my ($low,$high) = @_;
-    return $low + rand($high-$low);
-};
-
-use Data::Dumper;
-
-sub grid_coords {
-    my ($size,$point) = @_;
-    join "\t", map { int($_/$size) } @$point;
-};
-
-# Return x(i)+e(i) and x(i)-e(i)
-# by using the grid
-# This should be the cartesian product enumerating
-# [-1,0,1] over all dimensions
-
-my %grid_neighbours;
-sub neighbour_points {
-    my ($size,$point,$grid) = @_;
-    
-    my $dimension = 0+@$point;
-    my $vectors;
-    if (! $grid_neighbours{ $dimension }) {
-        my @elements = (-1,0,1);
-        $grid_neighbours{ $dimension } =
-        # Count up, and use the number in ternary as our odometer
-        [map {
-            my $val = $_;
-            my $res = [ map { 
-                          my $res = $elements[ $val % 3 ];
-                          $val = int($val/3);
-                          $res
-                        } 1..$dimension ];
-            } (1..3**$dimension)
-        ];
-    };
-    
-    my @coords = split /\t/, grid_coords( $size, $point );
-
-    # Find the elements in the grid according to the offsets
-    map {
-        my $e = $_;
-        my $n = join "\t", map { $coords[$_]+$e->[$_] } 0..$#$_;
-        $grid->{ $n } ? $grid->{ $n } : ()
-    } @{ $grid_neighbours{ $dimension }};
-};
-
-# Euclidean length of a vector
-sub norm {
-    sqrt( sum @{[map {$_**2} @_]} );
-};
-
-# Euclidean distance between two points
-sub vdist {
-    my ($l,$r) = @_;
-    my @connector = map { $l->[$_] - $r->[$_] } 0..$#$l;
-    norm(@connector);
-};
-
-sub random_unit_vector {
-    # idea taken from http://burtleburtle.net/bob/rand/unitvec.html
-    # resp. Knuth, _The Art of Computer Programming_, vol. 2,
-    # 3rd. ed., section 3.4.1.E.6.
-    # but not verified
-    my ($dimensions) = @_;
-    my (@vec,$len);
-    
-    # Create normal distributed coordinates
-    # around 0 in (-1,1)    
-    RETRY: {
-        @vec = map { 1-2*gaussian() } 1..$dimensions;
-        $len = norm(@vec);
-        redo RETRY unless $len;
-    };
-    # Normalize our vector so we get a unit vector
-    @vec = map { $_ / $len } @vec;
-    
-    \@vec
-};
 
 sub points {
     my ($class,%options) = @_;
@@ -102,13 +86,7 @@ sub points {
     $options{r} ||= 10;
     #$options{max} ||= 10; # we want to fill the space instead?!
     
-    # See http://www.cs.ubc.ca/~rbridson/docs/bridson-siggraph07-poissondisk.pdf
-    # This should adapt to multiple dimensions
-    # I guess it's radius / n-th root of n.
-    # XXX Need to think about this
     my $grid_size = $options{ r } / sqrt( 0+@{$options{dimensions}});
-    # A grid can't nicely model discs, so this is only an approximation
-    # Pfeh.
     
     my @result;
     my @work;
@@ -170,4 +148,147 @@ sub points {
     \@result
 };
 
+=head2 INTERNAL SUBROUTINES
+
+These subroutines are used for the algorithm.
+If you want to port this module to PDL or any other
+vector library, you will likely have to rewrite these.
+
+=head3 C<< rnd( $low, $high ) >>
+
+    print rnd( 0, 1 );
+
+Returns a uniform distributed random number
+in C<< [ $low, $high ) >>.
+
+=cut
+
+sub rnd {
+    my ($low,$high) = @_;
+    return $low + rand($high-$low);
+};
+
+=head3 C<< grid_coords( $grid_size, $point ) >>
+
+Returns the string representing the coordinates
+of the grid cell in which C<< $point >> falls.
+
+=cut
+
+sub grid_coords {
+    my ($size,$point) = @_;
+    join "\t", map { int($_/$size) } @$point;
+};
+
+=head3 C<< norm( @vector ) >>
+
+    print norm( 1,1 ); # 1.4142
+
+Returns the Euclidean length of the vector, passed in as array.
+
+=cut
+
+sub norm {
+    sqrt( sum @{[map {$_**2} @_]} );
+};
+
+=head3 C<< vdist( $l, $r ) >>
+
+    print vdist( [1,0], [0,1] ); # 1.4142
+
+Returns the Euclidean distance between two points
+(or vectors)
+
+=cut
+
+sub vdist {
+    my ($l,$r) = @_;
+    my @connector = map { $l->[$_] - $r->[$_] } 0..$#$l;
+    norm(@connector);
+};
+
+=head3 C<< neighbour_points( $size, $point, $grid ) >>
+
+    my @neighbours = neighbour_points( $size, $p, \%grid )
+
+Returns the points from the grid that have a distance
+between 0 and 2r around C<$point>. These points are
+the candidates to check when trying to insert a new
+random point into the space.
+
+my %grid_neighbours; # cache for the cubes
+sub neighbour_points {
+    my ($size,$point,$grid) = @_;
+    
+    my $dimension = 0+@$point;
+    my $vectors;
+    if (! $grid_neighbours{ $dimension }) {
+        my @elements = (-1,0,1);
+        $grid_neighbours{ $dimension } =
+        # Count up, and use the number in ternary as our odometer
+        [map {
+            my $val = $_;
+            my $res = [ map { 
+                          my $res = $elements[ $val % 3 ];
+                          $val = int($val/3);
+                          $res
+                        } 1..$dimension ];
+            } (1..3**$dimension)
+        ];
+    };
+    
+    my @coords = split /\t/, grid_coords( $size, $point );
+
+    # Find the elements in the grid according to the offsets
+    map {
+        my $e = $_;
+        my $n = join "\t", map { $coords[$_]+$e->[$_] } 0..$#$_;
+        # Negative grid positions never get filled, conveniently!
+        $grid->{ $n } ? $grid->{ $n } : ()
+    } @{ $grid_neighbours{ $dimension }};
+};
+
+=head3 C<< random_unit_vector( $dimensions ) >>
+
+    print join ",", @{ random_unit_vector( 2 ) };
+
+Returns a vector of unit lenght
+poiting in a random uniform distributed
+I<n>-dimensional direction
+angle
+and returns a unit vector pointing in
+that direction
+
+The algorithm used is outlined in 
+Knuth, _The Art of Computer Programming_, vol. 2,
+3rd. ed., section 3.4.1.E.6.
+but has not been verified formally or mathematically
+by the module author.
+
+=cut
+
+sub random_unit_vector {
+    my ($dimensions) = @_;
+    my (@vec,$len);
+    
+    # Create normal distributed coordinates
+    # around 0 in (-1,1)    
+    RETRY: {
+        @vec = map { 1-2*gaussian() } 1..$dimensions;
+        $len = norm(@vec);
+        redo RETRY unless $len;
+    };
+    # Normalize our vector so we get a unit vector
+    @vec = map { $_ / $len } @vec;
+    
+    \@vec
+};
+
 1;
+
+=head1 TODO
+
+The module does not use L<PDL> or any other
+vector library.
+
+=cut
