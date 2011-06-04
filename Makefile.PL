@@ -25,7 +25,9 @@ WriteMakefile1(
     'LICENSE'       => 'perl',
     'VERSION_FROM'  => 'lib/Random/PoissonDisc.pm', # finds $VERSION
     'PREREQ_PM'     => { 
-                       # some MT PRNG
+                       'List::Util' => 0, # for sum()
+                       'Math::Random::MT::Auto' => 0, # for gaussian distribution
+                       #'Math::Random::MT' => 0, # a good pRNG
                        # 'Algorithm::Loops' => 0, # do we?
                       }, # e.g., Module::Name => 1.1
     ABSTRACT_FROM   => 'lib/Random/PoissonDisc.pm', # retrieve abstract from module

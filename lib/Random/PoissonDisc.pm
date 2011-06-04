@@ -1,5 +1,7 @@
 package Random::PoissonDisc;
 use strict;
+use List::Util qw(sum);
+use Math::Random::MT::Auto qw(rand gaussian);
 
 =head1 NAME
 
