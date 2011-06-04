@@ -8,7 +8,6 @@ MANIFEST.skip
 README
 t/01-random-unit-vector.t
 t/99-changes.t
-t/99-examples.t
 t/99-manifest.t
 t/99-pod.t
 t/99-todo.t
