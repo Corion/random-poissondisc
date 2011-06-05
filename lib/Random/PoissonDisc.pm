@@ -51,13 +51,13 @@ Acceptable options are:
 
 =item *
 
-C<<r>> - minimum distance between points.
+C<< r >> - minimum distance between points.
 
 Default is 10 units.
 
 =item *
 
-C<<dimensions>> - number of dimensions and respective value range as an arrayref.
+C<< dimensions >> - number of dimensions and respective value range as an arrayref.
 
 Default is
 
@@ -68,7 +68,7 @@ range [0, 100).
 
 =item *
 
-C<<candidates>> - Number of candidates to inspect before deciding that no
+C<< candidates >> - Number of candidates to inspect before deciding that no
 ew neighbours can be placed around a point.
 
 Default is 30.
