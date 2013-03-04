@@ -23,7 +23,7 @@ Random::PoissonDisc - distribute points aesthetically in R^n
         for @$points;
 
 This module allows relatively fast
-(O(N)) generation of random points in
+(linear in the number of points generated) generation of random points in
 I<n>-dimensional space with a distance of
 at least C<r> between each other. This distribution
 results in aesthetic so called "blue noise".
@@ -51,13 +51,13 @@ Acceptable options are:
 
 =item *
 
-C<< r >> - minimum distance between points.
+C< r > - minimum distance between points.
 
 Default is 10 units.
 
 =item *
 
-C<< dimensions >> - number of dimensions and respective value range as an arrayref.
+C< dimensions > - number of dimensions and respective value range as an arrayref.
 
 Default is
 
@@ -68,7 +68,7 @@ range [0, 100).
 
 =item *
 
-C<< candidates >> - Number of candidates to inspect before deciding that no
+C< candidates > - Number of candidates to inspect before deciding that no
 ew neighbours can be placed around a point.
 
 Default is 30.
@@ -256,8 +256,8 @@ sub neighbour_points {
 
     print join ",", @{ random_unit_vector( 2 ) };
 
-Returns a vector of unit lenght
-poiting in a random uniform distributed
+Returns a vector of unit length
+pointing in a random uniform distributed
 I<n>-dimensional direction
 angle
 and returns a unit vector pointing in
