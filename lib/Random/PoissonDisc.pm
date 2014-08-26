@@ -276,9 +276,8 @@ sub random_unit_vector {
     my (@vec,$len);
     
     # Create normal distributed coordinates
-    # around 0 in (-1,1)    
     RETRY: {
-        @vec = map { 1-2*gaussian() } 1..$dimensions;
+        @vec = map { gaussian() } 1..$dimensions;
         $len = norm(@vec);
         redo RETRY unless $len;
     };
