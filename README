@@ -9,9 +9,10 @@ SYNOPSIS
         print join( ",", @$_),"\n"
             for @$points;
 
-    This module allows relatively fast (O(N)) generation of random points in
-    *n*-dimensional space with a distance of at least `r' between each
-    other. This distribution results in aesthetic so called "blue noise".
+    This module allows relatively fast (linear in the number of points
+    generated) generation of random points in *n*-dimensional space with a
+    distance of at least `r' between each other. This distribution results
+    in aesthetic so called "blue noise".
 
     The algorithm was adapted from a sketch by Robert Bridson in
     http://www.cs.ubc.ca/~rbridson/docs/bridson-siggraph07-poissondisk.pdf.
@@ -27,11 +28,11 @@ DATA REPRESENTATION
 
     Acceptable options are:
 
-    *   `<r'> - minimum distance between points.
+    *   ` r ' - minimum distance between points.
 
         Default is 10 units.
 
-    *   `<dimensions'> - number of dimensions and respective value range as
+    *   ` dimensions ' - number of dimensions and respective value range as
         an arrayref.
 
         Default is
@@ -41,7 +42,7 @@ DATA REPRESENTATION
         meaning all points will be in R^2 , with each coordinate in the
         range [0, 100).
 
-    *   `<candidates'> - Number of candidates to inspect before deciding
+    *   ` candidates ' - Number of candidates to inspect before deciding
         that no ew neighbours can be placed around a point.
 
         Default is 30.
@@ -87,7 +88,7 @@ DATA REPRESENTATION
     `random_unit_vector( $dimensions )'
         print join ",", @{ random_unit_vector( 2 ) };
 
-    Returns a vector of unit lenght poiting in a random uniform distributed
+    Returns a vector of unit length pointing in a random uniform distributed
     *n*-dimensional direction angle and returns a unit vector pointing in
     that direction
 
