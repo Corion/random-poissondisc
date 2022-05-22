@@ -69,7 +69,7 @@ range [0, 100).
 =item *
 
 C< candidates > - Number of candidates to inspect before deciding that no
-ew neighbours can be placed around a point.
+new neighbours can be placed around a point.
 
 Default is 30.
 
