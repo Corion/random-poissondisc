@@ -89,12 +89,12 @@ If greater than zero, this will not plot points within that distance from the ed
 
 =item *
 
-C<< center >> - Start adding points at the center of the cube.
+C<< center >> - Start adding points at the center of the plot.
 
 Default is C<0>
 
 If this is set to the default, the initial point will be added at a
-random position in the cube.
+random position in the plot.
 
 =back
 
