@@ -4,7 +4,7 @@ use List::Util qw(sum);
 use Math::Random::MT::Auto qw(rand gaussian);
 
 use vars qw($VERSION %grid_neighbours);
-$VERSION = '0.02';
+$VERSION = '0.03';
 
 # %grid_neighbours caches the vectors pointing to
 # neighbours
