@@ -61,6 +61,13 @@ DATA REPRESENTATION
         If greater than zero, this will not plot points within that distance
         from the edge.
 
+    *   `< center'> - Start adding points at the center of the cube.
+
+        Default is 0
+
+        If this is set to the default, the initial point will be added at a
+        random position in the cube.
+
   INTERNAL SUBROUTINES
     These subroutines are used for the algorithm. If you want to port this
     module to PDL or any other vector library, you will likely have to
