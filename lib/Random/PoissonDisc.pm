@@ -87,6 +87,15 @@ Default is C<0>
 
 If greater than zero, this will not plot points within that distance from the edge.
 
+=item *
+
+C<< center >> - Start adding points at the center of the cube.
+
+Default is C<0>
+
+If this is set to the default, the initial point will be added at a
+random position in the cube.
+
 =back
 
 =cut
@@ -94,6 +103,7 @@ If greater than zero, this will not plot points within that distance from the ed
 sub points {
     my ($class,%options) = @_;
     
+    $options{center}     ||= 0;
     $options{avoid_edge} ||= 0;
     $options{candidates} ||= 30;
     $options{dimensions} ||= [100,100]; # do we only create integral points?
@@ -106,8 +116,10 @@ sub points {
     my @result;
     my @work;
         
-    # Create a first random point somewhere in our cube:
-    my $p = [map { rnd(0,$_) } @{ $options{ dimensions }}];
+    # Create a first point in our cube - either at random or in the center:
+    my $p = $options{ center }
+        ? [map { $_ / 2 } @{ $options{ dimensions }}]
+        : [map { rnd(0,$_) } @{ $options{ dimensions }}];
     push @result, $p;
     push @work, $p;
     my $c = grid_coords($grid_size, $p);
