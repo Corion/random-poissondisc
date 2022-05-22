@@ -53,6 +53,13 @@ DATA REPRESENTATION
 
         In the algorithm description, this constant is named *k*.
 
+    *   `< avoid_edge'> - The distance from the edge of the plot.
+
+        Default is 0
+
+        If greater than zero, this will not plot points within that distance
+        from the edge.
+
   INTERNAL SUBROUTINES
     These subroutines are used for the algorithm. If you want to port this
     module to PDL or any other vector library, you will likely have to

@@ -79,6 +79,14 @@ the longer the algorithm will run for generating a number of points.
 
 In the algorithm description, this constant is named I<k>.
 
+=item *
+
+C<< avoid_edge >> - The distance from the edge of the plot.
+
+Default is C<0>
+
+If greater than zero, this will not plot points within that distance from the edge.
+
 =back
 
 =cut
@@ -86,6 +94,7 @@ In the algorithm description, this constant is named I<k>.
 sub points {
     my ($class,%options) = @_;
     
+    $options{avoid_edge} ||= 0;
     $options{candidates} ||= 30;
     $options{dimensions} ||= [100,100]; # do we only create integral points?
     $options{r} ||= 10;
@@ -122,8 +131,8 @@ sub points {
             # Check whether our point lies within the dimensions
             for (0..$#$p) {
                  next CANDIDATE
-                    if   $p->[$_] >= $options{ dimensions }->[ $_ ]
-                      or $p->[$_] < 0
+                    if   $p->[$_] >= $options{ dimensions }->[ $_ ] - $options{ avoid_edge }
+                      or $p->[$_] < $options{ avoid_edge }
             };
             
             # check discs by using the grid
