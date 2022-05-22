@@ -1,5 +1,4 @@
 .gitignore
-.prove
 bin/random-poissondisc.pl
 Changes
 lib/Random/PoissonDisc.pm
